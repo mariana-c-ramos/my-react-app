@@ -1,57 +1,23 @@
 import './App.css';
-import { useState } from 'react';
-import { Task } from './Task';
-
+import { useState, useEffect } from 'react';
+import Axios from 'axios';
 
 function App() {
-  const [todoList, setTodoList] = useState([]);
-  const [newTask, setNewTask] = useState("");
+  const [generatedExcuse, setGeneratedExcuse] = useState("");
 
-  const handleNewTask = (event) => {
-    setNewTask(event.target.value)
-  }
-
-  const addTask = () => {
-    const task = {
-      id: todoList.length === 0 ? 1 : todoList[todoList.length - 1].id + 1,
-      taskName: newTask,
-      completed: false
-    }
-    setTodoList([...todoList, task])
-  }
-
-  const deleteTask = (id) => {
-    setTodoList(todoList.filter((task) => task.id !== id));
-  }
-
-  const completeTask = (id) => {
-    setTodoList(todoList.map((task) => {
-      if(task.id === id) {
-        return {...task, completed: true}
-      } else {
-        return task
-      }
-    }))
+  const fetchData = (excuse) => {
+    Axios.get(`https://excuser-three.vercel.app/v1/excuse/${excuse}`).then((res) => {
+      setGeneratedExcuse(res.data[0].excuse)
+    });
   }
 
   return (
     <div className="App">
-      <div className="addTask">
-        <input onChange={handleNewTask}/>
-        <button onClick={addTask}>Add task</button>
-      </div>
-      <div className="list">
-        {todoList.map((task) => {
-          return (
-            <Task
-            taskName={task.taskName}
-            id={task.id}
-            completed={task.completed}
-            deleteTask={deleteTask}
-            completeTask={completeTask}/>
-          )
-        })}
-      </div>
+      <h1>Generate an excuse</h1>
+      <button onClick={() => fetchData("family")}>Excuse for familiy</button>
+      <button onClick={() => fetchData("office")}>Excuse for office</button>
+      <button onClick={() => fetchData("party")}>Excuse for party</button>
+      <p>Excuse: {generatedExcuse}</p>
     </div>
   )
 }
